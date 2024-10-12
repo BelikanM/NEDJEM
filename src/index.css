@@ -1,13 +1,147 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* Style du conteneur principal */
+.app-container {
+  margin-top: 60px; /* Hauteur du header pour éviter que le contenu ne soit masqué */
+  padding: 1rem; /* Espacement autour du contenu */
+  min-height: calc(100vh - 60px); /* Hauteur minimale pour que le contenu occupe tout l'espace restant */
+  display: flex;
+  flex-direction: column;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+/* Style des cartes de page */
+.page-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  flex: 1; /* Permet aux cartes de prendre tout l'espace disponible */
+  overflow: auto; /* Permet le défilement si le contenu dépasse */
+}
+
+/* Animation de bordure arc-en-ciel */
+@keyframes rainbow-border {
+  0% { border-color: orange; }
+  25% { border-color: blue; }
+  50% { border-color: green; }
+  75% { border-color: yellow; }
+  100% { border-color: red; }
+}
+
+.card-box, .icon-box {
+  border: 4px solid;
+  border-radius: 8px;
+  animation: rainbow-border 3s infinite linear;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  transition: transform 0.3s ease;
+}
+
+.card-box:hover, .icon-box:hover {
+  transform: scale(1.05);
+}
+
+/* Styles globaux */
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f0f2f5; /* Couleur de fond douce pour l'application */
+}
+
+/* Style de la barre de navigation */
+nav {
+  background-color: #ffffff;
+  border-radius: 12px; /* Coins arrondis */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Ombre légère pour effet de profondeur */
+  border: 1px solid #e1e1e1; /* Bordure légère pour séparer la carte du fond */
+  margin: 16px; /* Espacement externe */
+  padding: 12px; /* Espacement interne */
+}
+
+nav .container {
+  max-width: 1200px; /* Largeur maximale du conteneur */
+  margin: 0 auto; /* Centrer le conteneur */
+}
+
+nav .logo {
+  display: flex;
+  align-items: center;
+  font-size: 1.5rem;
+  color: #25d366; /* Couleur du logo similaire à WhatsApp */
+}
+
+nav .logo i {
+  font-size: 2rem; /* Taille des icônes du logo */
+}
+
+nav .nav-links {
+  display: flex;
+  gap: 2rem; /* Espacement entre les liens ajusté */
+  flex-wrap: wrap; /* Permet aux liens de passer à la ligne si l'espace est limité */
+}
+
+nav .nav-link {
+  color: #333333; /* Couleur du texte des liens */
+  text-decoration: none; /* Supprimer le soulignement par défaut */
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* Espacement entre l'icône et le texte */
+  transition: color 0.3s; /* Transition douce pour les changements de couleur */
+}
+
+nav .nav-link:hover {
+  color: #25d366; /* Couleur des liens au survol */
+}
+
+nav .nav-link i {
+  font-size: 1.25rem; /* Taille des icônes des liens */
+}
+
+/* Media queries pour le responsive design */
+@media (max-width: 768px) {
+  nav {
+    margin: 8px; /* Réduire les marges externes sur mobile */
+    padding: 8px; /* Réduire les paddings internes sur mobile */
+  }
+
+  nav .logo {
+    font-size: 1.25rem; /* Réduire la taille du logo sur mobile */
+  }
+
+  nav .logo i {
+    font-size: 1.75rem; /* Réduire la taille des icônes du logo sur mobile */
+  }
+
+  nav .nav-links {
+    gap: 1rem; /* Réduire l'espacement entre les liens sur mobile */
+    flex-direction: column; /* Empilement vertical des liens sur mobile */
+    align-items: flex-start; /* Aligner les liens à gauche */
+  }
+
+  nav .nav-link {
+    font-size: 1rem; /* Réduire la taille du texte des liens sur mobile */
+  }
+
+  nav .nav-link i {
+    font-size: 1rem; /* Réduire la taille des icônes des liens sur mobile */
+  }
+}
+
+@media (max-width: 480px) {
+  nav {
+    margin: 4px; /* Réduire encore les marges externes sur les petits écrans */
+    padding: 4px; /* Réduire encore les paddings internes sur les petits écrans */
+  }
+
+  nav .logo {
+    font-size: 1rem; /* Réduire la taille du logo sur les très petits écrans */
+  }
+
+  nav .logo i {
+    font-size: 1.5rem; /* Réduire la taille des icônes du logo sur les très petits écrans */
+  }
+
+  nav .nav-link {
+    font-size: 0.875rem; /* Réduire la taille du texte des liens sur les très petits écrans */
+  }
 }

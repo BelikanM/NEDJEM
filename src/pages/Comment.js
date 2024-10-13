@@ -4,8 +4,7 @@ import { collection, onSnapshot, query, where, getDoc, doc, updateDoc, increment
 import { FaList, FaArrowsAltH } from 'react-icons/fa';
 import Color from './Color';
 import VideoComponent from './VideoComponent';
-import Chat from './Chat';
-import CommentCount from './CommentCount'; // Import the CommentCount component
+import Comments from './Comments';
 
 const Home = () => {
   const [uploads, setUploads] = useState([]);
@@ -226,14 +225,13 @@ const Home = () => {
             <div key={upload.id} className="rounded-lg p-4 shimmering-border">
               <h2 className="font-bold">{upload.title}</h2>
               <p>{upload.description}</p>
-              <CommentCount uploadId={upload.id} /> {/* Use CommentCount here */}
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center">
                 <img
-                  src={userProfiles[upload.userId]?.photoURL || 'default-profile.png'}
-                  alt="Profile"
-                  className="w-8 h-8 rounded-full"
+                  src={userProfiles[upload.userId]?.photoURL || '/default-profile.png'}
+                  alt={userProfiles[upload.userId]?.displayName || 'Unknown'}
+                  className="w-8 h-8 rounded-full mr-2"
                 />
-                <p className="text-sm">{userProfiles[upload.userId]?.displayName || 'Unknown'}</p>
+                <p className="text-sm">Posted by: {userProfiles[upload.userId]?.displayName || 'Unknown'}</p>
               </div>
               <button
                 onClick={() => handleLike(upload)}
@@ -272,9 +270,9 @@ const Home = () => {
               {expandedItems[upload.id] && (
                 <div className="mt-2">
                   <p>{upload.textContent}</p>
+                  <Comments uploadId={upload.id} />
                 </div>
               )}
-              <Chat uploadId={upload.id} user={user} />
             </div>
           ))}
         </div>
@@ -289,14 +287,13 @@ const Home = () => {
             <div key={upload.id} className="rounded-lg p-4 w-64 flex-shrink-0 transform hover:scale-105 transition-transform shimmering-border">
               <h2 className="font-bold">{upload.title}</h2>
               <p>{upload.description}</p>
-              <CommentCount uploadId={upload.id} /> {/* Use CommentCount here */}
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center">
                 <img
-                  src={userProfiles[upload.userId]?.photoURL || 'default-profile.png'}
-                  alt="Profile"
-                  className="w-8 h-8 rounded-full"
+                  src={userProfiles[upload.userId]?.photoURL || '/default-profile.png'}
+                  alt={userProfiles[upload.userId]?.displayName || 'Unknown'}
+                  className="w-8 h-8 rounded-full mr-2"
                 />
-                <p className="text-sm">{userProfiles[upload.userId]?.displayName || 'Unknown'}</p>
+                <p className="text-sm">Posted by: {userProfiles[upload.userId]?.displayName || 'Unknown'}</p>
               </div>
               <button
                 onClick={() => handleLike(upload)}
@@ -326,7 +323,6 @@ const Home = () => {
                   <i className="fas fa-file-pdf"></i> View PDF
                 </a>
               )}
-              <Chat uploadId={upload.id} user={user} />
             </div>
           ))}
         </div>

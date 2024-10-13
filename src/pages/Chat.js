@@ -1,196 +1,232 @@
-// Import Firebase SDK et React
-import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import React, { useState, useEffect, useRef } from 'react';
+import { db } from '../firebaseConfig';
+import { collection, addDoc, onSnapshot, query, where, serverTimestamp, getDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { FaReply, FaEdit, FaTrash, FaPaperclip, FaPaperPlane, FaMicrophone, FaStop } from 'react-icons/fa';
 
-// Configuration Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyBpHAFxdho0Gb63EE86k-NmSrD1zckEcSQ",
-  authDomain: "starviews.firebaseapp.com",
-  projectId: "starviews",
-  storageBucket: "starviews.appspot.com",
-  messagingSenderId: "92372461515",
-  appId: "1:92372461515:web:957158c9f62cb94ca6384e"
-};
+const Chat = ({ uploadId, user }) => {
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState('');
+  const [media, setMedia] = useState(null);
+  const [audioUrl, setAudioUrl] = useState(null);
+  const [userProfiles, setUserProfiles] = useState({});
+  const [showChat, setShowChat] = useState(false);
+  const [replyTo, setReplyTo] = useState(null);
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
 
-// Initialisation de Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
-const storage = getStorage(app);
-
-const Chat = () => {
-  const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState('');
-  const [user, setUser] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [file, setFile] = useState(null);
-  const [contacts, setContacts] = useState([]);
-  const [selectedChat, setSelectedChat] = useState(null);
-  const messagesEndRef = useRef(null);
-
-  // Authentification Google
-  const signInWithGoogle = () => {
-    const provider = new GoogleAuthProvider();
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        setUser(result.user);
-      })
-      .catch((error) => {
-        console.error('Erreur lors de la connexion:', error);
-      });
-  };
-
-  // Déconnexion
-  const handleSignOut = () => {
-    signOut(auth).then(() => setUser(null));
-  };
-
-  // Récupération des messages en temps réel
   useEffect(() => {
-    if (selectedChat) {
-      const q = query(collection(db, `chats/${selectedChat}/messages`), orderBy('timestamp', 'asc'));
-      const unsubscribe = onSnapshot(q, (querySnapshot) => {
-        const msgs = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-        setMessages(msgs);
-      });
-
-      return () => unsubscribe();
-    }
-  }, [selectedChat]);
-
-  // Envoi de message texte
-  const sendMessage = async (e) => {
-    e.preventDefault();
-    if (newMessage.trim() === '') return;
-
-    try {
-      await addDoc(collection(db, `chats/${selectedChat}/messages`), {
-        text: newMessage,
-        uid: user.uid,
-        displayName: user.displayName,
-        timestamp: new Date(),
-        type: 'text',
-        read: false
-      });
-      setNewMessage('');
-    } catch (error) {
-      console.error('Erreur lors de l\'envoi du message:', error);
-    }
-  };
-
-  // Envoi de fichier
-  const sendFile = async () => {
-    if (!file) return;
-    
-    const storageRef = ref(storage, `files/${new Date().getTime()}_${file.name}`);
-    const uploadTask = uploadBytesResumable(storageRef, file);
-
-    // Progression du téléchargement
-    uploadTask.on('state_changed', 
-      (snapshot) => {
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        setUploadProgress(progress);
-      }, 
-      (error) => console.error('Erreur lors du téléchargement du fichier:', error),
-      async () => {
-        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-        await addDoc(collection(db, `chats/${selectedChat}/messages`), {
-          fileUrl: downloadURL,
-          uid: user.uid,
-          displayName: user.displayName,
-          timestamp: new Date(),
-          type: 'file',
-          read: false
-        });
-        setFile(null);
-        setUploadProgress(0);
-      }
-    );
-  };
-
-  // Marquer les messages comme lus
-  const markAsRead = async () => {
-    messages.forEach(async (msg) => {
-      if (msg.uid !== user.uid && !msg.read) {
-        const msgRef = doc(db, `chats/${selectedChat}/messages`, msg.id);
-        await updateDoc(msgRef, { read: true });
-      }
-    });
-  };
-
-  // Suppression d'un message
-  const deleteMessage = async (id) => {
-    await deleteDoc(doc(db, `chats/${selectedChat}/messages`, id));
-  };
-
-  // Fonction de recherche de messages
-  const searchMessages = (query) => {
-    return messages.filter(msg => msg.text.toLowerCase().includes(query.toLowerCase()));
-  };
-
-  // Initialiser les contacts (groupes ou individus)
-  useEffect(() => {
-    const q = query(collection(db, 'users'));
+    const q = query(collection(db, 'commentaires'), where('uploadId', '==', uploadId));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const users = querySnapshot.docs.map(doc => doc.data());
-      setContacts(users);
+      const commentsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setComments(commentsData);
     });
-
     return () => unsubscribe();
-  }, []);
+  }, [uploadId]);
+
+  useEffect(() => {
+    const fetchUserProfiles = async () => {
+      const profiles = {};
+      for (const comment of comments) {
+        if (!userProfiles[comment.userId]) {
+          const userDoc = await getDoc(doc(db, 'users', comment.userId));
+          if (userDoc.exists()) {
+            profiles[comment.userId] = userDoc.data();
+          }
+        }
+      }
+      setUserProfiles(prev => ({ ...prev, ...profiles }));
+    };
+    fetchUserProfiles();
+  }, [comments]);
+
+  const handleAddComment = async () => {
+    if (newComment.trim() === '' && !media && !audioUrl) return;
+
+    let mediaUrl = '';
+    if (media) {
+      const storage = getStorage();
+      const mediaRef = ref(storage, `media/${media.name}`);
+      await uploadBytes(mediaRef, media);
+      mediaUrl = await getDownloadURL(mediaRef);
+    }
+
+    if (audioUrl) {
+      mediaUrl = audioUrl;
+    }
+
+    if (editingCommentId) {
+      await updateDoc(doc(db, 'commentaires', editingCommentId), {
+        text: newComment,
+        mediaUrl,
+        updatedAt: serverTimestamp(),
+      });
+      setEditingCommentId(null);
+    } else {
+      await addDoc(collection(db, 'commentaires'), {
+        text: newComment,
+        uploadId,
+        userId: user.uid,
+        replyTo,
+        mediaUrl,
+        createdAt: serverTimestamp(),
+      });
+    }
+
+    setNewComment('');
+    setMedia(null);
+    setAudioUrl(null);
+    setReplyTo(null);
+  };
+
+  const handleEdit = (commentId, text) => {
+    setEditingCommentId(commentId);
+    setNewComment(text);
+  };
+
+  const handleDelete = async (commentId) => {
+    await deleteDoc(doc(db, 'commentaires', commentId));
+  };
+
+  const handleMediaChange = (e) => {
+    setMedia(e.target.files[0]);
+  };
+
+  const toggleChat = () => {
+    setShowChat(!showChat);
+  };
+
+  const handleReply = (comment) => {
+    setReplyTo(comment.id);
+    setNewComment(`@${userProfiles[comment.userId]?.displayName || 'Utilisateur inconnu'}: "${comment.text.split(' ').slice(0, 5).join(' ')}..."`);
+  };
+
+  const startRecording = async () => {
+    if (!navigator.mediaDevices || !window.MediaRecorder) {
+      alert('Recording not supported in this browser.');
+      return;
+    }
+
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorderRef.current = new MediaRecorder(stream);
+    audioChunksRef.current = [];
+
+    mediaRecorderRef.current.ondataavailable = (event) => {
+      audioChunksRef.current.push(event.data);
+    };
+
+    mediaRecorderRef.current.onstop = async () => {
+      const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+      const storage = getStorage();
+      const audioRef = ref(storage, `audio/${Date.now()}.webm`);
+      await uploadBytes(audioRef, audioBlob);
+      const url = await getDownloadURL(audioRef);
+      setAudioUrl(url);
+    };
+
+    mediaRecorderRef.current.start();
+    setIsRecording(true);
+  };
+
+  const stopRecording = () => {
+    mediaRecorderRef.current.stop();
+    setIsRecording(false);
+  };
 
   return (
-    <div className="chat-container">
-
-      <div className="sidebar">
-        <h3>Contacts</h3>
-        <ul>
-          {contacts.map(contact => (
-            <li key={contact.uid} onClick={() => setSelectedChat(contact.uid)}>
-              {contact.displayName}
-            </li>
-          ))}
-        </ul>
-        <button onClick={handleSignOut}>Déconnexion</button>
-      </div>
-
-      <div className="chat-content">
-        {!selectedChat ? (
-          <div>Sélectionnez un chat</div>
-        ) : (
-          <>
-            <div className="chat-box">
-              {messages.map((msg) => (
-                <div key={msg.id} className={`message ${msg.uid === user?.uid ? 'own' : ''}`}>
-                  {msg.type === 'text' ? <span>{msg.text}</span> : <a href={msg.fileUrl}>Télécharger le fichier</a>}
-                  <button onClick={() => deleteMessage(msg.id)}>Supprimer</button>
-                </div>
-              ))}
-              <div ref={messagesEndRef} />
-            </div>
-
-            <form onSubmit={sendMessage} className="chat-input">
+    <div className="mt-4">
+      <button onClick={toggleChat} className="bg-blue-500 text-white px-2 py-1 rounded text-sm">
+        {showChat ? 'Cacher' : 'Afficher'}
+      </button>
+      {showChat && (
+        <div className="mt-4">
+          {user && (
+            <div className="mb-4">
               <input
                 type="text"
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                placeholder="Entrez votre message"
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder="Ajouter un commentaire..."
+                className="border p-2 w-full"
               />
-              <button type="submit">Envoyer</button>
-            </form>
-
-            <input type="file" onChange={(e) => setFile(e.target.files[0])} />
-            {file && <button onClick={sendFile}>Envoyer le fichier</button>}
-            {uploadProgress > 0 && <div>Progression: {uploadProgress}%</div>}
-          </>
-        )}
-      </div>
+              <div className="flex items-center space-x-2 mt-2">
+                <label className="cursor-pointer">
+                  <FaPaperclip className="text-gray-600" />
+                  <input
+                    type="file"
+                    onChange={handleMediaChange}
+                    className="hidden"
+                  />
+                </label>
+                <button
+                  onClick={isRecording ? stopRecording : startRecording}
+                  className={`p-1 rounded flex items-center justify-center ${isRecording ? 'bg-red-500' : 'bg-green-500'}`}
+                >
+                  {isRecording ? <FaStop /> : <FaMicrophone />}
+                </button>
+                <button
+                  onClick={handleAddComment}
+                  className="bg-blue-500 text-white p-1 rounded flex items-center justify-center"
+                >
+                  <FaPaperPlane />
+                </button>
+              </div>
+            </div>
+          )}
+          <div className="space-y-2 h-64 overflow-y-auto border p-2">
+            {comments.map(comment => (
+              <div key={comment.id} className="flex items-start space-x-2">
+                <img
+                  src={userProfiles[comment.userId]?.photoURL || 'default-profile.png'}
+                  alt="Profile"
+                  className="w-8 h-8 rounded-full"
+                />
+                <div className="flex-1">
+                  <p className="text-sm font-bold">{userProfiles[comment.userId]?.displayName || 'Utilisateur inconnu'}</p>
+                  <p className="text-gray-600">{comment.text}</p>
+                  {comment.mediaUrl && (
+                    <div className="mt-2">
+                      {comment.mediaUrl.includes('audio') ? (
+                        <audio controls src={comment.mediaUrl} className="w-full" />
+                      ) : (
+                        <img
+                          src={comment.mediaUrl}
+                          alt="Media"
+                          className="max-w-full h-auto rounded"
+                          style={{ maxHeight: '150px' }}
+                        />
+                      )}
+                    </div>
+                  )}
+                  <div className="flex space-x-2 mt-1 text-gray-500">
+                    <FaReply
+                      onClick={() => handleReply(comment)}
+                      className="cursor-pointer"
+                    />
+                    {comment.userId === user.uid && (
+                      <>
+                        <FaEdit
+                          onClick={() => handleEdit(comment.id, comment.text)}
+                          className="cursor-pointer"
+                        />
+                        <FaTrash
+                          onClick={() => handleDelete(comment.id)}
+                          className="cursor-pointer"
+                        />
+                      </>
+                    )}
+                    {comment.replyTo && (
+                      <p className="text-xs text-gray-500">En réponse à {userProfiles[comment.replyTo]?.displayName}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

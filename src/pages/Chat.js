@@ -179,7 +179,7 @@ const Chat = ({ uploadId, user }) => {
             {comments.map(comment => (
               <div key={comment.id} className="flex items-start space-x-2">
                 <img
-                  src={userProfiles[comment.userId]?.photoURL || 'default-profile.png'}
+                  src={userProfiles[comment.userId]?.profilePhotoUrl || 'default-profile.png'}
                   alt="Profile"
                   className="w-8 h-8 rounded-full"
                 />

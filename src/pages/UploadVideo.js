@@ -92,12 +92,11 @@ const ProfilePage = () => {
       setUser(loggedInUser);
       localStorage.setItem('user', JSON.stringify(loggedInUser));
 
-      // Add new user to the database if not present
       const userDoc = await getDoc(doc(db, 'users', loggedInUser.uid));
       if (!userDoc.exists()) {
         await setDoc(doc(db, 'users', loggedInUser.uid), {
           displayName: loggedInUser.displayName,
-          profilePhotoUrl: loggedInUser.photoURL || '', // Store the Google profile photo URL
+          profilePhotoUrl: loggedInUser.photoURL || '',
           coverPhotoUrl: '',
         });
       }
@@ -190,7 +189,9 @@ const ProfilePage = () => {
     <div className="container mx-auto p-4">
       {/* Nav Bar */}
       <nav className="flex justify-between items-center p-4 bg-gray-800 text-white shadow-md">
-        <h1 className="text-xl font-bold">Profile Page</h1>
+        <h1 className="text-xl font-bold">
+          {user ? user.displayName : 'Profile Page'}
+        </h1>
         {user ? (
           <button onClick={handleLogout} className="bg-red-500 flex items-center gap-2 px-4 py-2 rounded">
             <FaSignOutAlt /> Logout
@@ -204,22 +205,46 @@ const ProfilePage = () => {
 
       {/* Profile & Cover Photo */}
       <div className="relative mt-4">
-        {coverPhotoUrl && (
-          <img
-            src={coverPhotoUrl}
-            alt="Cover"
-            className="w-full h-48 object-cover rounded-lg shadow-md"
-          />
-        )}
-        {profilePhotoUrl ? (
-          <img
-            src={profilePhotoUrl}
-            alt="Profile"
-            className="w-32 h-32 rounded-full border-4 border-white absolute top-[-4rem] left-4 shadow-lg"
-          />
-        ) : (
-          <FaUserCircle className="w-32 h-32 rounded-full border-4 border-white absolute top-[-4rem] left-4 shadow-lg text-gray-400" />
-        )}
+        <div className="relative">
+          {coverPhotoUrl ? (
+            <img
+              src={coverPhotoUrl}
+              alt="Cover"
+              className="w-full h-48 object-cover rounded-lg shadow-md"
+            />
+          ) : (
+            <div className="w-full h-48 bg-gray-200 rounded-lg shadow-md"></div>
+          )}
+          <label className="absolute top-2 right-2 cursor-pointer">
+            <FaCamera className="text-white bg-black rounded-full p-1" />
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => handlePhotoUpload(e.target.files[0], 'cover')}
+              className="hidden"
+            />
+          </label>
+        </div>
+        <div className="relative">
+          {profilePhotoUrl ? (
+            <img
+              src={profilePhotoUrl}
+              alt="Profile"
+              className="w-32 h-32 rounded-full border-4 border-white absolute top-[-4rem] left-4 shadow-lg"
+            />
+          ) : (
+            <FaUserCircle className="w-32 h-32 rounded-full border-4 border-white absolute top-[-4rem] left-4 shadow-lg text-gray-400" />
+          )}
+          <label className="absolute top-0 left-24 cursor-pointer">
+            <FaCamera className="text-white bg-black rounded-full p-1" />
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => handlePhotoUpload(e.target.files[0], 'profile')}
+              className="hidden"
+            />
+          </label>
+        </div>
       </div>
 
       {/* Upload Section */}
@@ -301,7 +326,18 @@ const ProfilePage = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {uploads.map((upload) => (
               <div key={upload.id} className="bg-white shadow-lg rounded-lg p-4">
-                <h3 className="font-bold mb-2">{upload.title}</h3>
+                <div className="flex items-center gap-2 mb-2">
+                  {profilePhotoUrl ? (
+                    <img
+                      src={profilePhotoUrl}
+                      alt={user.displayName}
+                      className="w-8 h-8 rounded-full"
+                    />
+                  ) : (
+                    <FaUserCircle className="w-8 h-8 text-gray-400" />
+                  )}
+                  <h3 className="font-bold">{upload.title}</h3>
+                </div>
                 <p>{upload.description}</p>
                 {upload.videoUrl && (
                   <video controls src={upload.videoUrl} className="w-full mt-2 rounded-lg" />
@@ -352,7 +388,6 @@ const ProfilePage = () => {
               .map((user) => (
                 <div key={user.id} className="bg-white shadow-lg rounded-lg p-4 flex justify-between items-center">
                   <div className="flex items-center gap-2">
-                    {/* If user has a profile photo, display it; otherwise, show a default icon */}
                     {user.profilePhotoUrl ? (
                       <img
                         src={user.profilePhotoUrl}

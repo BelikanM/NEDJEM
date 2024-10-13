@@ -5,7 +5,7 @@ import { FaList, FaArrowsAltH } from 'react-icons/fa';
 import Color from './Color';
 import VideoComponent from './VideoComponent';
 import Chat from './Chat';
-import CommentCount from './CommentCount'; // Import the CommentCount component
+import CommentCount from './CommentCount';
 
 const Home = () => {
   const [uploads, setUploads] = useState([]);
@@ -77,14 +77,18 @@ const Home = () => {
 
   const fetchUserProfiles = async (uploads) => {
     const profiles = {};
-    for (const upload of uploads) {
+    const promises = uploads.map(async (upload) => {
       if (!userProfiles[upload.userId]) {
         const userDoc = await getDoc(doc(db, 'users', upload.userId));
         if (userDoc.exists()) {
-          profiles[upload.userId] = userDoc.data();
+          profiles[upload.userId] = {
+            displayName: userDoc.data().displayName,
+            profilePhotoUrl: userDoc.data().profilePhotoUrl
+          };
         }
       }
-    }
+    });
+    await Promise.all(promises);
     setUserProfiles(prev => ({ ...prev, ...profiles }));
   };
 
@@ -226,10 +230,10 @@ const Home = () => {
             <div key={upload.id} className="rounded-lg p-4 shimmering-border">
               <h2 className="font-bold">{upload.title}</h2>
               <p>{upload.description}</p>
-              <CommentCount uploadId={upload.id} /> {/* Use CommentCount here */}
+              <CommentCount uploadId={upload.id} />
               <div className="flex items-center space-x-2">
                 <img
-                  src={userProfiles[upload.userId]?.photoURL || 'default-profile.png'}
+                  src={userProfiles[upload.userId]?.profilePhotoUrl || 'default-profile.png'}
                   alt="Profile"
                   className="w-8 h-8 rounded-full"
                 />
@@ -289,10 +293,10 @@ const Home = () => {
             <div key={upload.id} className="rounded-lg p-4 w-64 flex-shrink-0 transform hover:scale-105 transition-transform shimmering-border">
               <h2 className="font-bold">{upload.title}</h2>
               <p>{upload.description}</p>
-              <CommentCount uploadId={upload.id} /> {/* Use CommentCount here */}
+              <CommentCount uploadId={upload.id} />
               <div className="flex items-center space-x-2">
                 <img
-                  src={userProfiles[upload.userId]?.photoURL || 'default-profile.png'}
+                  src={userProfiles[upload.userId]?.profilePhotoUrl || 'default-profile.png'}
                   alt="Profile"
                   className="w-8 h-8 rounded-full"
                 />

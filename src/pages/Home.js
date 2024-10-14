@@ -7,6 +7,7 @@ import VideoComponent from './VideoComponent';
 import Chat from './Chat';
 import CommentCount from './CommentCount';
 import Cadran from './Cadran';
+import Map from './Map';
 
 const Home = () => {
   const [uploads, setUploads] = useState([]);
@@ -26,6 +27,7 @@ const Home = () => {
   const [randomMode, setRandomMode] = useState(true);
   const [showVideo, setShowVideo] = useState(false);
   const [videoUrl, setVideoUrl] = useState('');
+  const [userLocations, setUserLocations] = useState({});
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -200,6 +202,50 @@ const Home = () => {
     }
   };
 
+  useEffect(() => {
+    if (user) {
+      const fetchLocations = async () => {
+        const locations = {};
+
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            locations[user.uid] = [position.coords.latitude, position.coords.longitude];
+            setUserLocations(prev => ({ ...prev, ...locations }));
+          },
+          (error) => {
+            console.error("Error getting user location:", error);
+          }
+        );
+
+        for (const followedUserId in follows) {
+          if (follows[followedUserId]) {
+            const userDocRef = doc(db, 'users', followedUserId);
+            const userDocSnap = await getDoc(userDocRef);
+
+            if (userDocSnap.exists()) {
+              const userData = userDocSnap.data();
+              if (userData.location) {
+                locations[followedUserId] = userData.location;
+                setUserLocations(prev => ({ ...prev, ...locations }));
+              }
+            }
+          }
+        }
+      };
+
+      fetchLocations();
+
+      const watchId = navigator.geolocation.watchPosition((position) => {
+        const location = [position.coords.latitude, position.coords.longitude];
+        const userDocRef = doc(db, 'users', user.uid);
+        updateDoc(userDocRef, { location });
+        setUserLocations(prev => ({ ...prev, [user.uid]: location }));
+      });
+
+      return () => navigator.geolocation.clearWatch(watchId);
+    }
+  }, [user, follows]);
+
   const renderVerticalList = () => {
     return filteredUploads.map(upload => (
       <div key={upload.id} className="rounded-lg p-4 border border-gray-200 shadow-md hover:border-blue-500 transition">
@@ -254,6 +300,9 @@ const Home = () => {
           </div>
         )}
         <Chat uploadId={upload.id} user={user} />
+        <div className="mt-2">
+          <Map locations={userLocations} highlightedUserId={upload.userId} />
+        </div>
       </div>
     ));
   };

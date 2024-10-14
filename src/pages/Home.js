@@ -8,6 +8,7 @@ import Chat from './Chat';
 import CommentCount from './CommentCount';
 import Cadran from './Cadran';
 import Map from './Map';
+import Notification from './Notification'; // Import the Notification component
 
 const Home = () => {
   const [uploads, setUploads] = useState([]);
@@ -168,13 +169,13 @@ const Home = () => {
         shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${text}`;
         break;
       case 'instagram':
-        alert('Instagram sharing is not supported via web.');
+        alert('Le partage Instagram n\'est pas supporté via le web.');
         return;
       case 'whatsapp':
         shareUrl = `https://api.whatsapp.com/send?text=${text} ${url}`;
         break;
       case 'tiktok':
-        alert('TikTok sharing is not supported via web.');
+        alert('Le partage TikTok n\'est pas supporté via le web.');
         return;
       default:
         return;
@@ -186,7 +187,7 @@ const Home = () => {
   const renderSocialButtons = (upload) => (
     <div className="flex space-x-2 mt-2">
       <button onClick={() => openShareModal(upload)} className="flex items-center text-blue-500 hover:text-blue-700">
-        <i className="fas fa-share mr-1"></i> Share
+        <i className="fas fa-share mr-1"></i> Partager
       </button>
     </div>
   );
@@ -213,7 +214,7 @@ const Home = () => {
             setUserLocations(prev => ({ ...prev, ...locations }));
           },
           (error) => {
-            console.error("Error getting user location:", error);
+            console.error("Erreur d'obtention de la localisation de l'utilisateur :", error);
           }
         );
 
@@ -258,7 +259,7 @@ const Home = () => {
             alt="Profile"
             className="w-8 h-8 rounded-full"
           />
-          <p className="text-sm text-gray-700">{userProfiles[upload.userId]?.displayName || 'Unknown'}</p>
+          <p className="text-sm text-gray-700">{userProfiles[upload.userId]?.displayName || 'Inconnu'}</p>
         </div>
         <button
           onClick={() => handleLike(upload)}
@@ -285,14 +286,14 @@ const Home = () => {
             rel="noopener noreferrer"
             className="text-blue-500 mt-2 block"
           >
-            <i className="fas fa-file-pdf"></i> View PDF
+            <i className="fas fa-file-pdf"></i> Voir le PDF
           </a>
         )}
         <button
           onClick={() => toggleDetails(upload.id)}
           className="mt-2 text-blue-600 hover:underline"
         >
-          {expandedItems[upload.id] ? 'Hide Details' : 'Show Details'}
+          {expandedItems[upload.id] ? 'Cacher Détails' : 'Voir Détails'}
         </button>
         {expandedItems[upload.id] && (
           <div className="mt-2">
@@ -314,9 +315,13 @@ const Home = () => {
     }
   };
 
+  const navigateToChat = (uploadId, messageId) => {
+    // Logic to handle chat navigation when a notification is clicked
+    console.log(`Navigating to chat for upload: ${uploadId}, message: ${messageId}`);
+  };
+
   return (
     <div className={`container mx-auto p-4 ${colors.bg} ${colors.text} transition-all duration-300`}>
-      <Color setColors={setColors} randomMode={randomMode} />
       <div className="flex justify-between items-center mb-4">
         <Cadran />
         <div className="flex space-x-2">
@@ -324,15 +329,16 @@ const Home = () => {
           <FaStar className="text-yellow-500 animate-spin-slow" />
           <FaStar className="text-yellow-500 animate-spin-slow" />
         </div>
+        <Notification user={user} navigateToChat={navigateToChat} />
         <button className="text-sm bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700 transition" onClick={toggleRandomMode}>
-          {randomMode ? 'Stop Random Mode' : 'Start Random Mode'}
+          {randomMode ? 'Arrêter Mode Aléatoire' : 'Démarrer Mode Aléatoire'}
         </button>
       </div>
       <input
         type="text"
         value={searchTerm}
         onChange={(e) => handleSearch(e.target.value)}
-        placeholder="Search for uploads..."
+        placeholder="Rechercher des uploads..."
         className="border p-2 mb-4 w-full rounded-lg"
       />
       <div className="text-center p-4 mb-4 bg-white rounded-lg shadow-lg">
@@ -351,7 +357,7 @@ const Home = () => {
       <div className="bg-white rounded-lg p-4 mb-4 max-h-96 overflow-y-auto shadow-lg">
         <div className="flex items-center mb-4">
           <FaList className="text-xl mr-2" />
-          <h2 className="text-xl font-bold">Vertical List</h2>
+          <h2 className="text-xl font-bold">Liste Verticale</h2>
         </div>
         <div className="space-y-4">
           {renderVerticalList()}
@@ -360,7 +366,7 @@ const Home = () => {
       <div className="rounded-lg p-4 mb-4 bg-white shadow-lg">
         <div className="flex items-center mb-4">
           <FaArrowsAltH className="text-xl mr-2" />
-          <h2 className="text-xl font-bold">Video Stories</h2>
+          <h2 className="text-xl font-bold">Histoires Vidéo</h2>
         </div>
         <div className="flex overflow-x-auto space-x-4">
           {filteredUploads.filter(upload => upload.videoUrl).map(upload => (
@@ -384,7 +390,7 @@ const Home = () => {
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full mx-4">
-            <h2 className="text-xl font-bold mb-4">Share this Upload</h2>
+            <h2 className="text-xl font-bold mb-4">Partager cet Upload</h2>
             <div className="flex flex-wrap justify-center space-x-2">
               <button onClick={() => shareLink('facebook')} className="text-blue-600 hover:text-blue-800">
                 <i className="fab fa-facebook"></i> Facebook
@@ -406,7 +412,7 @@ const Home = () => {
               onClick={() => setShowModal(false)}
               className="mt-4 text-red-500 hover:text-red-700"
             >
-              Close
+              Fermer
             </button>
           </div>
         </div>

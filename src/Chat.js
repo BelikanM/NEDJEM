@@ -26,6 +26,63 @@ function EditMessageModal({ message, onSave, onCancel }) {
   );
 }
 
+function AudioRecorder({ onAudioRecorded }) {
+  const [isRecording, setIsRecording] = useState(false);
+  const [audioBlob, setAudioBlob] = useState(null);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+
+  const startRecording = async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorderRef.current = new MediaRecorder(stream);
+    audioChunksRef.current = [];
+
+    mediaRecorderRef.current.ondataavailable = (event) => {
+      if (event.data.size > 0) {
+        audioChunksRef.current.push(event.data);
+      }
+    };
+
+    mediaRecorderRef.current.onstop = () => {
+      const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
+      setAudioBlob(audioBlob);
+      onAudioRecorded(audioBlob);
+    };
+
+    mediaRecorderRef.current.start();
+    setIsRecording(true);
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
+  return (
+    <div className="flex items-center space-x-2">
+      {isRecording ? (
+        <button onClick={stopRecording} className="bg-red-600 text-white rounded-full p-2">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+          </svg>
+        </button>
+      ) : (
+        <button onClick={startRecording} className="bg-blue-600 text-white rounded-full p-2">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+          </svg>
+        </button>
+      )}
+      {audioBlob && (
+        <audio controls src={URL.createObjectURL(audioBlob)} className="max-w-full" />
+      )}
+    </div>
+  );
+}
+
 function Chat() {
   const [users, setUsers] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
@@ -116,19 +173,28 @@ function Chat() {
     setSelectedUser(user);
   };
 
-  const handleSendMessage = async () => {
-    if (newMessage.trim() || newMedia) {
+  const handleSendMessage = async (audioBlob = null) => {
+    if (newMessage.trim() || newMedia || audioBlob) {
       const chatId = [currentUser.uid, selectedUser.id].sort().join('_');
       let mediaUrl = '';
+      let mediaType = null;
+
       if (newMedia) {
         const storageRef = ref(storage, `chatMedia/${chatId}/${Date.now()}_${newMedia.name}`);
         await uploadBytes(storageRef, newMedia);
         mediaUrl = await getDownloadURL(storageRef);
+        mediaType = newMedia.type.split('/')[0];
+      } else if (audioBlob) {
+        const storageRef = ref(storage, `chatMedia/${chatId}/${Date.now()}_audio.wav`);
+        await uploadBytes(storageRef, audioBlob);
+        mediaUrl = await getDownloadURL(storageRef);
+        mediaType = 'audio';
       }
+
       await addDoc(collection(db, `chats/${chatId}/messages`), {
         text: newMessage.trim(),
         mediaUrl,
-        mediaType: newMedia ? newMedia.type.split('/')[0] : null,
+        mediaType,
         senderId: currentUser.uid,
         timestamp: serverTimestamp(),
       });
@@ -147,6 +213,10 @@ function Chat() {
   const handleDeleteMessage = async (messageId) => {
     const chatId = [currentUser.uid, selectedUser.id].sort().join('_');
     await deleteDoc(doc(db, `chats/${chatId}/messages`, messageId));
+  };
+
+  const handleAudioRecorded = (audioBlob) => {
+    handleSendMessage(audioBlob);
   };
 
   return (
@@ -211,16 +281,16 @@ function Chat() {
                     </div>
                     <div className={`max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl ${message.senderId === currentUser.uid ? 'mr-2' : 'ml-2'}`}>
                       <div className={`inline-block p-2 rounded-lg ${message.senderId === currentUser.uid ? 'bg-blue-600' : 'bg-gray-600'}`}>
-                        <p className="break-words">{message.text}</p>
+                        {message.text && <p className="break-words">{message.text}</p>}
                         {message.mediaUrl && (
                           <div className="mt-2">
                             {message.mediaType === 'image' ? (
                               <img src={message.mediaUrl} alt="Media" className="max-w-full h-auto rounded" style={{maxHeight: '200px'}} />
                             ) : message.mediaType === 'video' ? (
                               <video controls src={message.mediaUrl} className="max-w-full h-auto rounded" style={{maxHeight: '200px'}} />
-                            ) : (
+                            ) : message.mediaType === 'audio' ? (
                               <audio controls src={message.mediaUrl} className="max-w-full" />
-                            )}
+                            ) : null}
                           </div>
                         )}
                         {message.senderId === currentUser.uid && (
@@ -254,7 +324,8 @@ function Chat() {
               <label htmlFor="media-upload" className="bg-gray-700 text-white rounded p-2 cursor-pointer">
                 📎
               </label>
-              <button onClick={handleSendMessage} className="bg-blue-600 text-white rounded p-2">Envoyer</button>
+              <AudioRecorder onAudioRecorded={handleAudioRecorded} />
+              <button onClick={() => handleSendMessage()} className="bg-blue-600 text-white rounded p-2">Envoyer</button>
             </div>
           </div>
         ) : (

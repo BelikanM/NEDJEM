@@ -1,0 +1,14 @@
+/* src/components/design.css */
+.app-design {
+  background-color: #ffeb3b; /* Jaune */
+  color: #1b5e20; /* Vert */
+}
+
+button {
+  background-color: #2196f3; /* Bleu */
+  color: white;
+  border: none;
+  padding: 10px;
+  margin: 5px;
+  cursor: pointer;
+}

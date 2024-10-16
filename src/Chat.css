@@ -1,134 +1,85 @@
+body {
+  background-color: #1a202c; /* Dark background */
+  color: #f7fafc; /* Light text */
+}
+
+header {
+  background-color: #2d3748; /* Dark gray */
+  padding: 16px;
+}
+
+h1 {
+  color: #81e6d9; /* Teal */
+}
+
+h2 {
+  color: #f6e05e; /* Yellow */
+}
+
 .chat-container {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  background-color: #f0f0f0;
-}
-
-.chat-header {
-  background-color: #075E54;
-  color: white;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 20px;
-}
-
-.user-info {
-  display: flex;
-  align-items: center;
-}
-
-.user-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin-right: 10px;
-}
-
-.logout-btn, .login-btn {
-  background-color: #25D366;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 20px;
-  cursor: pointer;
-}
-
-.chat-main {
-  display: flex;
-  flex-grow: 1;
-}
-
-.chat-sidebar {
-  width: 300px;
-  background-color: #fff;
-  border-right: 1px solid #ddd;
-  padding: 20px;
-}
-
-.user-list {
-  list-style: none;
-  padding: 0;
-}
-
-.user-item {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-  cursor: pointer;
-  border-radius: 10px;
-  transition: background-color 0.3s ease;
-}
-
-.user-item.active, .user-item:hover {
-  background-color: #f1f1f1;
-}
-
-.user-item-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin-right: 10px;
-}
-
-.chat-area {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  background-color: #e5ddd5;
-}
-
-.messages {
-  flex-grow: 1;
-  padding: 20px;
-  overflow-y: scroll;
+  background-color: #2a4365; /* Dark blue */
+  border-radius: 8px;
+  padding: 16px;
 }
 
 .message {
-  margin: 10px 0;
-  max-width: 60%;
-  padding: 10px 15px;
-  border-radius: 15px;
-  word-wrap: break-word;
+  border-radius: 8px;
+  padding: 8px;
+  margin-bottom: 8px;
 }
 
-.message.sent {
-  background-color: #dcf8c6;
-  align-self: flex-end;
+.message .text {
+  color: #edf2f7; /* Light gray */
 }
 
-.message.received {
-  background-color: #fff;
-  align-self: flex-start;
+.message.sender {
+  background-color: #48bb78; /* Green */
+  text-align: right;
 }
 
-.message-media {
-  max-width: 200px;
-  border-radius: 10px;
+.message.receiver {
+  background-color: #63b3ed; /* Blue */
+  text-align: left;
 }
 
-.message-input {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-  background-color: #fff;
-  border-top: 1px solid #ddd;
-}
-
-.message-input input {
-  flex-grow: 1;
-  padding: 10px;
-  border-radius: 20px;
-  border: 1px solid #ddd;
-  margin-right: 10px;
-}
-
-.attach-btn, .send-btn, .call-btn {
+input[type="text"] {
+  width: 100%;
+  padding: 8px;
   border: none;
-  background: none;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  background-color: #4a5568; /* Dark gray for input */
+  color: #f7fafc;
+}
+
+button {
+  background-color: #38a169; /* Green */
+  color: #f7fafc;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
-  color: #075E54;
-  font-size: 20px;
-  margin-right: 10px;
+}
+
+button:hover {
+  background-color: #2f855a; /* Darker green */
+}
+
+button:disabled {
+  background-color: #a0aec0; /* Gray */
+  cursor: not-allowed;
+}
+
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #4fd1c5; /* Teal */
+  padding: 8px;
+  border-radius: 50%;
+  margin-left: 8px;
+}
+
+.icon-button:hover {
+  background-color: #38b2ac; /* Darker teal */
 }

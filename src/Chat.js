@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { db, auth, storage } from './firebaseConfig';
-import { collection, query, onSnapshot, addDoc, orderBy, serverTimestamp, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, query, onSnapshot, addDoc, orderBy, serverTimestamp, doc, updateDoc, deleteDoc, where } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { updateProfile } from 'firebase/auth';
 
@@ -97,7 +97,6 @@ function Chat() {
     const unsubscribe = auth.onAuthStateChanged(user => {
       if (user) {
         setCurrentUser(user);
-        updateUserInFirestore(user);
       } else {
         setCurrentUser(null);
       }
@@ -116,12 +115,13 @@ function Chat() {
             id: doc.id,
             displayName: doc.data().displayName,
             profilePhotoUrl: doc.data().profilePhotoUrl,
-            coverPhotoUrl: doc.data().coverPhotoUrl,
+            hasUnreadMessages: false,
           };
           if (userData.id !== currentUser.uid) {
             userList.push(userData);
           }
         });
+
         setUsers(userList);
       });
 
@@ -130,13 +130,38 @@ function Chat() {
   }, [currentUser]);
 
   useEffect(() => {
+    if (currentUser) {
+      users.forEach(user => {
+        const chatId = [currentUser.uid, user.id].sort().join('_');
+        const q = query(
+          collection(db, `chats/${chatId}/messages`),
+          where('read', '==', false),
+          where('senderId', '==', user.id)
+        );
+        const unsubscribe = onSnapshot(q, (querySnapshot) => {
+          const hasUnreadMessages = !querySnapshot.empty;
+          setUsers(prevUsers => 
+            prevUsers.map(u => u.id === user.id ? { ...u, hasUnreadMessages } : u)
+          );
+        });
+
+        return () => unsubscribe();
+      });
+    }
+  }, [currentUser, users]);
+
+  useEffect(() => {
     if (currentUser && selectedUser) {
       const chatId = [currentUser.uid, selectedUser.id].sort().join('_');
       const q = query(collection(db, `chats/${chatId}/messages`), orderBy('timestamp'));
       const unsubscribe = onSnapshot(q, (querySnapshot) => {
         const messageList = [];
         querySnapshot.forEach((doc) => {
-          messageList.push({ id: doc.id, ...doc.data() });
+          const messageData = { id: doc.id, ...doc.data() };
+          if (messageData.senderId !== currentUser.uid && !messageData.read) {
+            updateDoc(doc.ref, { read: true });
+          }
+          messageList.push(messageData);
         });
         setMessages(messageList);
       });
@@ -147,27 +172,6 @@ function Chat() {
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
-
-  const updateUserInFirestore = useCallback(async (user) => {
-    if (user) {
-      const userRef = doc(db, 'users', user.uid);
-      await updateDoc(userRef, {
-        displayName: user.displayName,
-        profilePhotoUrl: user.photoURL,
-      });
-    }
-  }, []);
-
-  const handleImageUpload = async (event) => {
-    const file = event.target.files[0];
-    if (file && currentUser) {
-      const storageRef = ref(storage, `profileImages/${currentUser.uid}`);
-      await uploadBytes(storageRef, file);
-      const downloadURL = await getDownloadURL(storageRef);
-      await updateProfile(currentUser, { photoURL: downloadURL });
-      await updateUserInFirestore(currentUser);
-    }
-  };
 
   const handleUserSelect = (user) => {
     setSelectedUser(user);
@@ -197,6 +201,7 @@ function Chat() {
         mediaType,
         senderId: currentUser.uid,
         timestamp: serverTimestamp(),
+        read: false,
       });
       setNewMessage('');
       setNewMedia(null);
@@ -232,13 +237,6 @@ function Chat() {
                   alt={currentUser.displayName} 
                   className="w-full h-full object-cover"
                 />
-                <label className="absolute bottom-0 right-0 bg-white rounded-full p-1 cursor-pointer">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  <input type="file" onChange={handleImageUpload} className="hidden" accept="image/*" />
-                </label>
               </div>
               <span className="text-xl font-semibold">{currentUser.displayName}</span>
             </div>
@@ -257,6 +255,9 @@ function Chat() {
                     alt={user.displayName} 
                     className="w-full h-full object-cover"
                   />
+                  {user.hasUnreadMessages && (
+                    <span className="absolute top-0 right-0 bg-blue-600 rounded-full w-4 h-4" />
+                  )}
                 </div>
                 <span className="mt-2 text-xs sm:text-sm font-semibold truncate w-20 sm:w-24 md:w-32 text-center">{user.displayName}</span>
               </div>

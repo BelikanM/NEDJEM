@@ -1,0 +1,19 @@
+const badWords = ['injure1', 'injure2', 'injure3']; // Ajoutez ici la liste des mots à filtrer
+
+const MessageFilter = {
+  filterMessage: (message) => {
+    let filteredMessage = message;
+    badWords.forEach(word => {
+      const regex = new RegExp(word, 'gi');
+      filteredMessage = filteredMessage.replace(regex, '*'.repeat(word.length));
+    });
+
+    if (filteredMessage !== message) {
+      alert("Attention : Votre message contient des termes inappropriés qui ont été filtrés.");
+    }
+
+    return filteredMessage;
+  }
+};
+
+export default MessageFilter;

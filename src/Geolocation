@@ -1,0 +1,30 @@
+import React, { useEffect, useState } from 'react';
+
+function Geolocation({ userLocation }) {
+  const [locationInfo, setLocationInfo] = useState(null);
+
+  useEffect(() => {
+    if (userLocation) {
+      // Ici, vous devriez utiliser un service de géocodage inverse pour obtenir les informations de localisation
+      // Pour cet exemple, nous allons simuler une réponse
+      setLocationInfo({
+        city: 'Paris',
+        country: 'France',
+        neighborhood: 'Le Marais'
+      });
+    }
+  }, [userLocation]);
+
+  if (!locationInfo) return null;
+
+  return (
+    <div className="mt-4 p-4 bg-gray-800 rounded-lg">
+      <h3 className="text-lg font-bold mb-2">Votre localisation</h3>
+      <p>Ville: {locationInfo.city}</p>
+      <p>Pays: {locationInfo.country}</p>
+      <p>Quartier: {locationInfo.neighborhood}</p>
+    </div>
+  );
+}
+
+export default Geolocation;

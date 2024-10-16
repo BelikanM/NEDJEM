@@ -1,0 +1,19 @@
+import React, { useEffect } from 'react';
+
+function UserSuggestion({ currentUser, users, setSuggestedUsers }) {
+  useEffect(() => {
+    // Simuler la récupération des contacts du téléphone
+    const phoneContacts = ['user1@example.com', 'user2@example.com', 'user3@example.com'];
+
+    // Filtrer les utilisateurs qui sont dans les contacts du téléphone
+    const suggested = users.filter(user => 
+      phoneContacts.includes(user.email) && user.id !== currentUser.uid
+    );
+
+    setSuggestedUsers(suggested);
+  }, [currentUser, users, setSuggestedUsers]);
+
+  return null; // Ce composant ne rend rien, il met simplement à jour l'état
+}
+
+export default UserSuggestion;

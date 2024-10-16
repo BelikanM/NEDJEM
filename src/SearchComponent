@@ -1,0 +1,13 @@
+import React from 'react';
+import { ReactComponent as UserSearchIcon } from '/static/media/UserSearch.7760e6d1aa28b94ad570.svg';
+
+function SearchComponent() {
+  return (
+    <div>
+      <UserSearchIcon />
+      <input type="text" placeholder="Rechercher..." />
+    </div>
+  );
+}
+
+export default SearchComponent;

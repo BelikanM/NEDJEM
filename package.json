@@ -2,8 +2,7 @@
   "name": "ox",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://<votre-nom-utilisateur>.github.io/<nom-du-depot>",  // Remplacez par votre nom d'utilisateur GitHub et le nom de votre dépôt
-  "dependencies": {
+  "homepage": "https://BelikanM.github.io/NEDJEM",  
     "@google-pay/button-react": "^3.1.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",

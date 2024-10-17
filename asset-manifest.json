@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/NEDJEM/static/css/main.8486f159.css",
+    "main.js": "/NEDJEM/static/js/main.0c933690.js",
+    "static/js/453.4d12c54e.chunk.js": "/NEDJEM/static/js/453.4d12c54e.chunk.js",
+    "index.html": "/NEDJEM/index.html",
+    "main.8486f159.css.map": "/NEDJEM/static/css/main.8486f159.css.map",
+    "main.0c933690.js.map": "/NEDJEM/static/js/main.0c933690.js.map",
+    "453.4d12c54e.chunk.js.map": "/NEDJEM/static/js/453.4d12c54e.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.8486f159.css",
+    "static/js/main.0c933690.js"
+  ]
+}

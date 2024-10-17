@@ -2,6 +2,7 @@
   "name": "ox",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://<votre-nom-utilisateur>.github.io/<nom-du-depot>",  // Remplacez par votre nom d'utilisateur GitHub et le nom de votre dépôt
   "dependencies": {
     "@google-pay/button-react": "^3.1.0",
     "@testing-library/jest-dom": "^5.17.0",
@@ -29,7 +30,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build", // Commande pour construire l'application avant le déploiement
+    "deploy": "gh-pages -d build" // Commande pour déployer sur GitHub Pages
   },
   "eslintConfig": {
     "extends": [

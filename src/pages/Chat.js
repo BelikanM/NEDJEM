@@ -29,18 +29,19 @@ const Chat = ({ uploadId, user }) => {
   useEffect(() => {
     const fetchUserProfiles = async () => {
       const profiles = {};
-      for (const comment of comments) {
-        if (!userProfiles[comment.userId]) {
-          const userDoc = await getDoc(doc(db, 'users', comment.userId));
+      const uniqueUserIds = new Set(comments.map(comment => comment.userId));
+      for (const userId of uniqueUserIds) {
+        if (!userProfiles[userId]) {
+          const userDoc = await getDoc(doc(db, 'users', userId));
           if (userDoc.exists()) {
-            profiles[comment.userId] = userDoc.data();
+            profiles[userId] = userDoc.data();
           }
         }
       }
       setUserProfiles(prev => ({ ...prev, ...profiles }));
     };
     fetchUserProfiles();
-  }, [comments]);
+  }, [comments, userProfiles]);
 
   const handleAddComment = async () => {
     if (newComment.trim() === '' && !media && !audioUrl) return;

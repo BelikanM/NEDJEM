@@ -2,21 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { db } from '../firebaseConfig';
 import { collection, onSnapshot, query, where, getDoc, doc, updateDoc, increment } from 'firebase/firestore';
 import { FaList, FaArrowsAltH, FaStar } from 'react-icons/fa';
-import Color from './Color';
 import VideoComponent from './VideoComponent';
 import Chat from './Chat';
 import CommentCount from './CommentCount';
 import Cadran from './Cadran';
 import Map from './Map';
-import Notification from './Notification'; // Import the Notification component
-
-import Algo from './Algo';
-
+import Notification from './Notification';
 
 const Home = () => {
   const [uploads, setUploads] = useState([]);
   const [filteredUploads, setFilteredUploads] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const itemsPerSlide = 3;
   const [expandedItems, setExpandedItems] = useState({});
@@ -27,8 +22,8 @@ const Home = () => {
   const [likedUploads, setLikedUploads] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [currentUpload, setCurrentUpload] = useState(null);
-  const [colors, setColors] = useState({ bg: 'bg-gray-100', text: 'text-gray-800' });
-  const [showVideo, setShowVideo] = useState(false);
+  const [colors] = useState({ bg: 'bg-gray-100', text: 'text-gray-800' });
+  const [showContent, setShowContent] = useState(false);
   const [videoUrl, setVideoUrl] = useState('');
   const [userLocations, setUserLocations] = useState({});
 
@@ -113,11 +108,6 @@ const Home = () => {
       });
       setFilteredUploads(filtered);
     }
-  };
-
-  const getCurrentItems = () => {
-    const start = currentIndex * itemsPerSlide;
-    return filteredUploads.slice(start, start + itemsPerSlide);
   };
 
   const toggleDetails = (id) => {
@@ -238,6 +228,14 @@ const Home = () => {
     }
   }, [user, follows]);
 
+  const handleBannerClick = (upload) => {
+    setCurrentUpload(upload);
+    setShowContent(true);
+    if (upload.videoUrl) {
+      setVideoUrl(upload.videoUrl);
+    }
+  };
+
   const renderVerticalList = () => {
     return filteredUploads.map(upload => (
       <div key={upload.id} className="rounded-lg p-4 border border-gray-200 shadow-md hover:border-blue-500 transition">
@@ -299,15 +297,7 @@ const Home = () => {
     ));
   };
 
-  const handleBannerClick = (upload) => {
-    if (upload.videoUrl) {
-      setVideoUrl(upload.videoUrl);
-      setShowVideo(true);
-    }
-  };
-
   const navigateToChat = (uploadId, messageId) => {
-    // Logic to handle chat navigation when a notification is clicked
     console.log(`Navigating to chat for upload: ${uploadId}, message: ${messageId}`);
   };
 
@@ -337,9 +327,10 @@ const Home = () => {
           </div>
         )}
       </div>
-      {showVideo && (
+      {showContent && currentUpload && (
         <div className="mb-4">
-          <VideoComponent videoUrl={videoUrl} />
+          {currentUpload.videoUrl && <VideoComponent videoUrl={videoUrl} />}
+          <Chat uploadId={currentUpload.id} user={user} />
         </div>
       )}
       <div className="bg-white rounded-lg p-4 mb-4 max-h-96 overflow-y-auto shadow-lg">

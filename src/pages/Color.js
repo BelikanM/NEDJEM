@@ -1,13 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 
 const Color = ({ setColors, randomMode }) => {
-  const colorCombinations = [
-    { bg: 'bg-green-500', text: 'text-black' }, // Green with black text
-    { bg: 'bg-yellow-500', text: 'text-black' }, // Yellow with black text
-    { bg: 'bg-blue-500', text: 'text-black' },  // Blue with black text for improved readability
-    { bg: 'bg-green-700', text: 'text-black' }, // Dark green with black text
-    { bg: 'bg-blue-700', text: 'text-black' },  // Dark blue with black text
-  ];
+  const colorCombinations = useMemo(() => [
+    { bg: 'bg-green-500', text: 'text-black' },
+    { bg: 'bg-yellow-500', text: 'text-black' },
+    { bg: 'bg-blue-500', text: 'text-black' },
+    { bg: 'bg-green-700', text: 'text-black' },
+    { bg: 'bg-blue-700', text: 'text-black' },
+  ], []);
 
   useEffect(() => {
     if (!randomMode) return;
@@ -17,12 +17,12 @@ const Color = ({ setColors, randomMode }) => {
       setColors(colorCombinations[randomIndex]);
     };
 
-    const interval = setInterval(changeColor, 3000); // Change every 3 seconds
+    const interval = setInterval(changeColor, 3000);
 
     return () => clearInterval(interval);
-  }, [setColors, randomMode]);
+  }, [setColors, randomMode, colorCombinations]);
 
-  return null; // No UI, just logic
+  return null;
 };
 
 export default Color;

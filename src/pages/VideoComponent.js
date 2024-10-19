@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, Suspense } from 'react';
 
 const VideoComponent = ({ videoUrl }) => {
   const videoRef = useRef(null);
@@ -8,33 +8,31 @@ const VideoComponent = ({ videoUrl }) => {
     const handleIntersection = (entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
+          videoRef.current.muted = false;
+          videoRef.current.play().catch((error) => console.log(error));
           setIsPlaying(true);
         } else {
+          videoRef.current.pause();
           setIsPlaying(false);
         }
       });
     };
 
     const observer = new IntersectionObserver(handleIntersection, {
-      threshold: 0.75 // Adjust this value to control visibility percentage
+      threshold: 0.75, // Higher threshold for better control
     });
 
-    if (videoRef.current) {
-      observer.observe(videoRef.current);
+    const currentVideo = videoRef.current;
+    if (currentVideo) {
+      observer.observe(currentVideo);
     }
 
     return () => {
-      if (videoRef.current) {
-        observer.unobserve(videoRef.current);
+      if (currentVideo) {
+        observer.unobserve(currentVideo);
       }
     };
   }, []);
-
-  useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.muted = !isPlaying;
-    }
-  }, [isPlaying]);
 
   const handleContextMenu = (e) => {
     e.preventDefault();
@@ -48,11 +46,21 @@ const VideoComponent = ({ videoUrl }) => {
       src={videoUrl}
       className="w-full mt-2"
       autoPlay
-      muted
       loop
+      playsInline
       onContextMenu={handleContextMenu}
+      preload="auto"
+      style={{ objectFit: 'cover' }}
     />
   );
 };
 
-export default VideoComponent;
+const VideoContainer = ({ videoUrl }) => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <VideoComponent videoUrl={videoUrl} />
+    </Suspense>
+  );
+};
+
+export default VideoContainer;

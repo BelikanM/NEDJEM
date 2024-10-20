@@ -7,7 +7,7 @@ const urlsToCache = [
   '/GTCTRI192.jpg',
   '/GTCTRI512.jpg',
   '/manifest.json',
-  '/styles.css',  // Ajoutez ici d'autres fichiers CSS, JS ou images si nécessaire
+  '/styles.css',
   '/scripts.js'
 ];
 
@@ -46,5 +46,64 @@ self.addEventListener('activate', (event) => {
         })
       );
     })
+  );
+});
+
+// Gestion des notifications push
+self.addEventListener('push', (event) => {
+  const data = event.data.json();
+  const options = {
+    body: data.body,
+    icon: '/GTCTRI192.jpg',
+    badge: '/GTCTRI64.jpg',
+    data: {
+      url: data.url
+    }
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(data.title, options)
+  );
+});
+
+// Gestion du clic sur la notification
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  event.waitUntil(
+    clients.openWindow(event.notification.data.url)
+  );
+});
+
+
+
+
+
+
+// public/sw.js
+
+self.addEventListener('push', function(event) {
+  const data = event.data.json();
+  const options = {
+    body: data.body,
+    icon: '/GTCTRI192.jpg',
+    badge: '/GTCTRI64.jpg'
+  };
+
+  event.waitUntil(
+    self.registration.showNotification("GTCTRI: " + data.title, options)
+  );
+});
+
+self.addEventListener('notificationclick', function(event) {
+  event.notification.close();
+  event.waitUntil(
+    clients.openWindow('/')
+  );
+});
+
+// Ajout d'un gestionnaire d'installation pour configurer le badge
+self.addEventListener('install', function(event) {
+  event.waitUntil(
+    self.registration.setBadge(1)
   );
 });

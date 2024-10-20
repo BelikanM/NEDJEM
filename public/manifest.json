@@ -1,6 +1,6 @@
 {
   "short_name": "GTCTRI",
-  "name": "Create React App Sample",
+  "name": "réseau social sécurisé ",
   "icons": [
     {
       "src": "GTCTRI64.jpg",
@@ -22,4 +22,6 @@
   "display": "standalone",
   "theme_color": "#000000",
   "background_color": "#ffffff"
+  "permissions": ["notifications", "badges"]
+
 }

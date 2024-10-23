@@ -1,19 +1,19 @@
 {
-  "short_name": "GTCTRI",
-  "name": "réseau social sécurisé ",
+  "short_name": "SATRVIEWS",
+  "name": "réseau social des stars ",
   "icons": [
     {
-      "src": "GTCTRI64.jpg",
+      "src": "starviews64.png",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
     },
     {
-      "src": "GTCTRI192.jpg",
+      "src": "SATRVIEWS192.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "GTCTRI512.jpg",
+      "src": "SATRVIEWS512.png",
       "type": "image/png",
       "sizes": "512x512"
     }

@@ -1,27 +1,63 @@
 {
   "short_name": "GTCTRI",
-  "name": "réseau social sécurisé ",
+  "name": "Réseau social sécurisé GTCTRI",
+  "description": "Une application de réseau social sécurisée pour partager et échanger.",
   "icons": [
     {
       "src": "GTCTRI64.jpg",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
+      "sizes": "64x64",
+      "type": "image/jpeg"
     },
     {
       "src": "GTCTRI192.jpg",
-      "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "type": "image/jpeg"
     },
     {
       "src": "GTCTRI512.jpg",
-      "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "type": "image/jpeg"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "theme_color": "#000000",
-  "background_color": "#ffffff"
-  "permissions": ["notifications", "badges"]
-
+  "background_color": "#ffffff",
+  "orientation": "portrait",
+  "dir": "ltr",
+  "lang": "fr-FR",
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "gcm_sender_id": "103953800507",
+  "shortcuts": [
+    {
+      "name": "Nouveau message",
+      "short_name": "Nouveau",
+      "description": "Créer un nouveau message",
+      "url": "/nouveau-message",
+      "icons": [{ "src": "GTCTRI192.jpg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Profil",
+      "short_name": "Profil",
+      "description": "Accéder à votre profil",
+      "url": "/profil",
+      "icons": [{ "src": "GTCTRI192.jpg", "sizes": "192x192" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot1.jpg",
+      "sizes": "1280x720",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "screenshot2.jpg",
+      "sizes": "1280x720",
+      "type": "image/jpeg"
+    }
+  ],
+  "permissions": ["notifications", "background"],
+  "features": ["cross-origin-isolated", "web-share"]
 }

@@ -4,6 +4,15 @@ import { collection, query, onSnapshot, addDoc, orderBy, serverTimestamp, doc, u
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import SuggestedProfiles from './SuggestedProfiles';
 import { FaPaperclip, FaMicrophone, FaPaperPlane } from 'react-icons/fa';
+import subscribeToPush from './push-subscription';
+import sendPushNotification from './push-api';
+import requestNotificationPermission from './notification-api';
+import Chapi from './Chapi';
+
+
+
+
+
 
 function EditMessageModal({ message, onSave, onCancel }) {
   const [editedText, setEditedText] = useState(message.text);
@@ -109,18 +118,32 @@ function Chat() {
 
   useEffect(() => {
     if (currentUser) {
-      users.forEach(user => {
+      users.forEach(async (user) => {
         const chatId = [currentUser.uid, user.id].sort().join('_');
         const q = query(
           collection(db, `chats/${chatId}/messages`),
           where('read', '==', false),
           where('senderId', '==', user.id)
         );
-        const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const unsubscribe = onSnapshot(q, async (querySnapshot) => {
           const hasUnreadMessages = !querySnapshot.empty;
           setUsers(prevUsers => 
             prevUsers.map(u => u.id === user.id ? { ...u, hasUnreadMessages } : u)
           );
+
+          if (hasUnreadMessages && !document.hasFocus()) {
+            try {
+              await requestNotificationPermission();
+              const subscription = await subscribeToPush();
+              await sendPushNotification(subscription, {
+                title: 'Nouveau message',
+                body: `Vous avez un nouveau message de ${user.displayName}`,
+                icon: user.profilePhotoUrl,
+              });
+            } catch (error) {
+              console.error('Error sending push notification:', error);
+            }
+          }
         });
 
         return () => unsubscribe();
@@ -220,7 +243,13 @@ function Chat() {
           </div>
         )}
         <SuggestedProfiles users={users} onSelectUser={handleUserSelect} />
+
+
+ <Chapi currentUser={currentUser} users={users} onSelectUser={handleUserSelect} />
+
+
       </header>
+
 
       <main className="p-4">
         {selectedUser ? (

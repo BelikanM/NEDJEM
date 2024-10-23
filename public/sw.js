@@ -74,36 +74,31 @@ self.addEventListener('notificationclick', (event) => {
   );
 });
 
-
-
-
-
-
-// public/sw.js
-
-self.addEventListener('push', function(event) {
-  const data = event.data.json();
-  const options = {
-    body: data.body,
-    icon: '/GTCTRI192.jpg',
-    badge: '/GTCTRI64.jpg'
-  };
-
-  event.waitUntil(
-    self.registration.showNotification("GTCTRI: " + data.title, options)
-  );
+// Gestion de l'événement beforeinstallprompt
+self.addEventListener('beforeinstallprompt', (event) => {
+  // Empêche l'affichage automatique de l'invite d'installation
+  event.preventDefault();
+  // Stocke l'événement pour une utilisation ultérieure
+  self.deferredPrompt = event;
+  // Informe la page qu'elle peut afficher le bouton d'installation
+  self.clients.matchAll({ type: 'window' }).then((clients) => {
+    clients.forEach((client) => {
+      client.postMessage({ action: 'showInstallButton' });
+    });
+  });
 });
 
-self.addEventListener('notificationclick', function(event) {
-  event.notification.close();
-  event.waitUntil(
-    clients.openWindow('/')
-  );
-});
-
-// Ajout d'un gestionnaire d'installation pour configurer le badge
-self.addEventListener('install', function(event) {
-  event.waitUntil(
-    self.registration.setBadge(1)
-  );
+// Gestionnaire d'événement pour l'installation de l'application
+self.addEventListener('message', (event) => {
+  if (event.data.action === 'installApp') {
+    self.deferredPrompt.prompt();
+    self.deferredPrompt.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === 'accepted') {
+        console.log('L\'utilisateur a accepté l\'invite d\'installation');
+      } else {
+        console.log('L\'utilisateur a refusé l\'invite d\'installation');
+      }
+      self.deferredPrompt = null;
+    });
+  }
 });

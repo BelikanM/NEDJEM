@@ -1,11 +1,11 @@
 // Nom du cache et fichiers à mettre en cache
-const CACHE_NAME = 'gtctri-cache-v1';
+const CACHE_NAME = 'starviews-cache-v1';
 const urlsToCache = [
   '/',
   '/index.html',
-  '/GTCTRI64.jpg',
-  '/GTCTRI192.jpg',
-  '/GTCTRI512.jpg',
+  '/starviews64.png',
+  '/starviews192.png',
+  '/starviews512.png',
   '/manifest.json',
   '/styles.css',
   '/scripts.js'
@@ -54,8 +54,8 @@ self.addEventListener('push', (event) => {
   const data = event.data.json();
   const options = {
     body: data.body,
-    icon: '/GTCTRI192.jpg',
-    badge: '/GTCTRI64.jpg',
+    icon: '/starviews192.png',
+    badge: '/starviews64.png',
     data: {
       url: data.url
     }
@@ -76,11 +76,8 @@ self.addEventListener('notificationclick', (event) => {
 
 // Gestion de l'événement beforeinstallprompt
 self.addEventListener('beforeinstallprompt', (event) => {
-  // Empêche l'affichage automatique de l'invite d'installation
   event.preventDefault();
-  // Stocke l'événement pour une utilisation ultérieure
   self.deferredPrompt = event;
-  // Informe la page qu'elle peut afficher le bouton d'installation
   self.clients.matchAll({ type: 'window' }).then((clients) => {
     clients.forEach((client) => {
       client.postMessage({ action: 'showInstallButton' });

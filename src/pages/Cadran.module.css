@@ -1,0 +1,45 @@
+/* Cadran.module.css */
+.cadran {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  width: 200px;
+  background: linear-gradient(135deg, green, yellow, blue);
+  border-radius: 50%;
+  border: 5px solid black;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  animation: scintiller 1s infinite alternate;
+}
+
+.star {
+  font-size: 80px; /* Taille de l'étoile */
+  color: blue; /* Couleur bleue pour l'étoile */
+  animation: rotate 3s linear infinite; /* Animation de rotation */
+}
+
+.text {
+  font-size: 24px;
+  font-weight: bold;
+  color: black;
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+  margin-top: 20px;
+}
+
+@keyframes scintiller {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.5;
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

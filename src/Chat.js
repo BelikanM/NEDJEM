@@ -4,8 +4,16 @@ import { collection, query, onSnapshot, addDoc, orderBy, serverTimestamp, doc, u
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import SuggestedProfiles from './SuggestedProfiles';
 import { FaPaperclip, FaMicrophone, FaPaperPlane } from 'react-icons/fa';
-import subscribeToPush from './push-subscription';
-import sendPushNotification from './push-api';
+
+
+import { usePushSubscription as subscribeToPush } from './push-subscription';
+
+
+
+import { sendPushNotification } from './push-api';
+
+
+
 import requestNotificationPermission from './notification-api';
 import Chapi from './Chapi';
 

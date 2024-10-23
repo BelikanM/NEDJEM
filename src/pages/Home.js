@@ -8,6 +8,11 @@ import CommentCount from './CommentCount';
 import Cadran from './Cadran';
 import Map from './Map';
 import Notification from './Notification';
+import './Home.css';
+
+
+
+
 
 const Home = () => {
   const [uploads, setUploads] = useState([]);

@@ -9,6 +9,8 @@ import CommentCount from './CommentCount';
 import Cadran from './Cadran';
 import Map from './Map';
 import Notification from './Notification';
+import { usePushSubscription } from './push-subscription';
+import { sendPushNotification } from './push-api';
 
 const Home = () => {
   const [uploads, setUploads] = useState([]);
@@ -363,40 +365,34 @@ const Home = () => {
                 <button
                   onClick={() => handleLike(upload)}
                   className={`text-lg ${likedUploads[upload.id] ? 'text-red-500' : 'text-gray-500'} hover:scale-110 transition-transform`}
+                  disabled={likedUploads[upload.id]}
                 >
-                  <i className={`fas fa-heart ${likedUploads[upload.id] ? 'text-red-500' : ''}`}></i> {upload.likes || 0}
+                  <i className={`fas fa-heart ${likedUploads[upload.id] ? 'text-red-500' : ''}`}></i>
                 </button>
               </div>
-              {renderSocialButtons(upload)}
             </div>
           ))}
         </div>
       </div>
-
+      <Color colors={colors} setColors={setColors} />
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full mx-4">
-            <h2 className="text-xl font-bold mb-4">Partager cet Upload</h2>
-            <div className="flex flex-wrap justify-center space-x-2">
-              <button onClick={() => shareLink('facebook')} className="text-blue-600 hover:text-blue-800">
-                <i className="fab fa-facebook"></i> Facebook
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg p-8">
+            <h2 className="text-xl font-bold mb-4">Partager</h2>
+            <div className="flex space-x-4">
+              <button onClick={() => shareLink('facebook')} className="text-blue-500 hover:text-blue-700">
+                <i className="fab fa-facebook fa-2x"></i>
               </button>
               <button onClick={() => shareLink('twitter')} className="text-blue-400 hover:text-blue-600">
-                <i className="fab fa-twitter"></i> Twitter
-              </button>
-              <button onClick={() => shareLink('instagram')} className="text-pink-500 hover:text-pink-700">
-                <i className="fab fa-instagram"></i> Instagram
+                <i className="fab fa-twitter fa-2x"></i>
               </button>
               <button onClick={() => shareLink('whatsapp')} className="text-green-500 hover:text-green-700">
-                <i className="fab fa-whatsapp"></i> WhatsApp
-              </button>
-              <button onClick={() => shareLink('tiktok')} className="text-black hover:text-gray-700">
-                <i className="fab fa-tiktok"></i> TikTok
+                <i className="fab fa-whatsapp fa-2x"></i>
               </button>
             </div>
             <button
               onClick={() => setShowModal(false)}
-              className="mt-4 text-red-500 hover:text-red-700"
+              className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg"
             >
               Fermer
             </button>

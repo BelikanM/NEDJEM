@@ -1,6 +1,6 @@
 {
-  "short_name": "SATRVIEWS",
-  "name": "réseau social des stars ",
+  "short_name": "Starviews",
+  "name": "Réseau social des stars",
   "icons": [
     {
       "src": "starviews64.png",
@@ -8,12 +8,12 @@
       "type": "image/x-icon"
     },
     {
-      "src": "SATRVIEWS192.png",
+      "src": "starviews192.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "SATRVIEWS512.png",
+      "src": "starviews512.png",
       "type": "image/png",
       "sizes": "512x512"
     }
@@ -21,7 +21,6 @@
   "start_url": ".",
   "display": "standalone",
   "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "background_color": "#ffffff",
   "permissions": ["notifications", "badges"]
-
 }

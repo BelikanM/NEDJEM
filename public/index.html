@@ -5,19 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
   
-  <title>GTCTRI App</title>
+  <title>Starviews App</title>
   
   <link rel="manifest" href="/manifest.json">
-  <link rel="icon" type="image/png" sizes="32x32" href="/GTCTRI64.jpg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/starviews64.png">
   
   <!-- Normalize CSS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" integrity="sha512-oHDEc8XedMKkwsG1hZmgJ26qxUXk4RCtbJjfsrjgoZ1EcP/Q/j0Kwe7db+nTdhNStYl3+tRfZFP+4XxZkiocjA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- FontAwesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnH4fXpvSAa2BQqSc2fVRoAUnHL2yqesGv+eOih3JRfOpWiVVp+vULpBItY1u2a+6xFYVXjXw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
   <!-- Bootstrap CSS -->
   <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
@@ -25,109 +25,18 @@
   <!-- Custom CSS -->
   <link rel="stylesheet" href="/styles.css" />
 
-
-
-
-
-
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
-  body {
-    font-family: 'Inter', sans-serif;
-  }
-
-  .container {
-    @apply mx-auto px-4 sm:px-6 lg:px-8;
-  }
-
-  .card {
-    @apply bg-white rounded-lg shadow-md p-6 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg;
-  }
-
-  .card-title {
-    @apply text-2xl font-bold mb-4;
-  }
-
-  .card-description {
-    @apply text-gray-600 mb-4;
-  }
-
-  .profile-photo {
-    @apply w-10 h-10 rounded-full object-cover;
-  }
-
-  .profile-name {
-    @apply text-lg font-semibold;
-  }
-
-  .like-button {
-    @apply text-red-500 hover:text-red-600 transition duration-200 ease-in-out;
-  }
-
-  .like-count {
-    @apply text-gray-600 ml-1;
-  }
-
-  .share-button {
-    @apply bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition duration-200 ease-in-out;
-  }
-
-  .video-container {
-    @apply w-full h-64 sm:h-80 md:h-96 rounded-lg overflow-hidden;
-  }
-
-  .video-player {
-    @apply w-full h-full object-cover;
-  }
-
-  .chat-container {
-    @apply bg-gray-100 p-4 rounded-lg;
-  }
-
-  .chat-message {
-    @apply bg-white p-2 rounded-lg mb-2;
-  }
-
-  .chat-input {
-    @apply border border-gray-300 rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500;
-  }
-
-  .notification-icon {
-    @apply text-red-500 animate-pulse;
-  }
-
-  .modal {
-    @apply fixed inset-0 flex items-center justify-center z-50;
-  }
-
-  .modal-overlay {
-    @apply fixed inset-0 bg-black opacity-50;
-  }
-
-  .modal-content {
-    @apply bg-white rounded-lg shadow-lg p-6 max-w-md mx-auto;
-  }
-
-  .social-share-button {
-    @apply flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 text-white transition duration-200 ease-in-out hover:bg-blue-600;
-  }
-</style>
-
-
-
-
-
-
-
-
-
-
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    /* Ajoutez ici vos classes et styles personnalisés */
+  </style>
 
 </head>
 <body>
   <div id="root">
-    <h1>Bienvenue sur l'application GTCTRI</h1>
+    <h1>Bienvenue sur l'application Starviews</h1>
     <p>Cette page démontre que l'application fonctionne correctement.</p>
     <button id="installButton" style="display: none;">Installer l'application</button>
     <div class="offline-message" style="display: none;">
@@ -141,13 +50,13 @@
   <script src="/static/js/main.js"></script>
 
   <!-- jQuery -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5/0m40BqVSMg8G+e+ld6MXx5/0enWADefB6Sfj5" crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
 
   <!-- Bootstrap JS -->
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   
   <!-- FontAwesome JS -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js" integrity="sha512-ZCXV5Z2Qyy0p5pG0ybfXkD9D2OToXq5vgAoAM1WOU9ZmOn5AaOg5OdXa9dD17SHo2VmRsaKHG5KTqGAzh5GKw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js" crossorigin="anonymous"></script>
 
   <!-- Custom JS -->
   <script>
